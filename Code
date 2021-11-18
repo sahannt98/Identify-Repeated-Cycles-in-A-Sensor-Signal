@@ -1,0 +1,59 @@
+A=load("tm.mat");
+y=A(:,1).series;
+x=[0:length(y)-1];
+figure(1)
+plot(x,y);
+title("Input Signal")
+ylim([-1 20]);
+x1=[10:15:length(x)-1];
+y1=zeros(1,round((length(y)-5)/15));
+
+r=1;
+for i=1:15:length(y)-15
+    c=1;
+    for j=i:i+14  
+      ary=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]  ;
+      dif=abs(y(j+1)-y(i));
+      ary(c)=ary(c)+dif;
+      c=c+1;
+    end  
+    y1(r)=y1(r)+max(ary);
+    r=r+1;
+end
+
+%figure(2)
+%plot(x1,y1)
+
+y2=y1<0.27;
+%figure(3)
+%plot(x1,y2)
+
+if length(x)<8000
+   B=[1 1 1 1 1];
+elseif 8000<length(x)<15000
+   B=[1 1 1 1 1 1 1 1 1];
+else
+   B=[1 1 1 1 1 1 1 1 1 1 1 1 1];
+end   
+L1=strfind(y2, B)
+y3=[];
+for k=1:length(L1)-1
+    d=L1(k+1)-L1(k);
+    if d>1
+          fnl=L1(k)+4;
+          fst=L1(k+1);
+          y3=[y3 fnl fst];
+    end
+end
+y3=[y3 x(length(x))/15];
+
+y3=y3*15
+figure(4);hold on
+plot(y)
+ylim([-1 18]);
+yL = get(gca,'YLim');
+for m=1:length(y3)
+    line([y3(m) y3(m)],yL,'Color','r');
+end
+title("Output Signal");
+hold off;
